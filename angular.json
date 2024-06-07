@@ -42,6 +42,7 @@
           },
           "configurations": {
             "production": {
+
               "budgets": [
                 {
                   "type": "initial",
@@ -64,7 +65,7 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
+        "server": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {

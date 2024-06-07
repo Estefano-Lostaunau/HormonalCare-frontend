@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod && ng run trabajofinal-avancep:server:production",
+    "build": "ng build && ng run trabajofinal-avancep:server:production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -26,6 +26,7 @@
     "@fullcalendar/interaction": "^6.1.10",
     "@fullcalendar/list": "^6.1.10",
     "@fullcalendar/timegrid": "^6.1.10",
+    "@nguniversal/express-engine": "^7.0.2",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
     "@types/gapi": "^0.0.47",
