@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng server",
-    "build": "ng build && ng run trabajofinal-avancep:server:production",
-    "watch": "ng build  --configuration development",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build ",
     "test": "ng test"
   },
   "private": true,
