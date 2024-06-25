@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { of } from 'rxjs';
 
 import { MatTableDataSource } from "@angular/material/table";
 import { MatPaginator } from "@angular/material/paginator";
@@ -9,6 +10,7 @@ import { PatientEntity } from "../../model/patient.entity";
 import {PatientsProfileService} from "../../services/patients-profile.service";
 import {MedicalAppointmentsService} from "../../services/medical-appointment.service";
 import {MedicalAppointmentEntity} from "../../model/medical-appointment.entity";
+import {ProfilesService} from "../../services/profiles.service"; // Import ProfileService
 import {forkJoin, map, Observable, switchMap} from "rxjs";
 
 @Component({
@@ -19,7 +21,7 @@ import {forkJoin, map, Observable, switchMap} from "rxjs";
 export class PatientsTableComponent implements OnInit {
   appointmentData: MedicalAppointmentEntity[] = [];
   dataSource!: MatTableDataSource<any>;
-  displayedColumns: string[] = ['name', 'age', 'clinicHistory', 'typeOfCare', 'hour', 'diagnosis', 'alert', 'videoConference'];
+  displayedColumns: string[] = ['name', 'age', 'clinicHistory', 'hour', 'videoConference'];
   showMedicalHistory = false;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
@@ -28,6 +30,7 @@ export class PatientsTableComponent implements OnInit {
   constructor(
     private patientService: PatientsProfileService,
     private medicalAppointmentService: MedicalAppointmentsService,
+    private profileService: ProfilesService, // Inject ProfileService
     private router: Router
   ) {
     this.dataSource = new MatTableDataSource<any>();
@@ -47,28 +50,28 @@ export class PatientsTableComponent implements OnInit {
   }
 
   private getAllPatientAppointments() {
-    this.patientService.getAll().subscribe((response: any) => {
+    this.medicalAppointmentService.getAll().subscribe((response: any) => {
       this.appointmentData = response;
       this.populateDataSourceWithPatientNames();
     });
   }
 
   private populateDataSourceWithPatientNames() {
-    const appointmentsWithPatientDetails: any[] = [];
     const observables: Observable<any>[] = [];
 
     for (const appointment of this.appointmentData) {
-      const observable = this.medicalAppointmentService.getMedicalAppointmentById(appointment.id).pipe(
-        switchMap((medicalAppointment: any) => {
-          const patientId = medicalAppointment.idPatient;
-          return this.patientService.getPatientDetails(patientId).pipe(
-            map((patient: PatientEntity) => {
-              const age = this.calculateAge(patient.birthdate); // Calculate age from birthdate
+      const observable = this.patientService.getPatientDetails(appointment.patientId.toString()).pipe(
+        switchMap((patient: PatientEntity) => {
+          return this.patientService.getProfileIdByPatientId(appointment.patientId).pipe(
+            switchMap((profileId: number) => {
+              return this.profileService.getProfileDetails(profileId.toString());
+            }),
+            map((profile: any) => {
               return {
-                ...medicalAppointment, // Include all medical appointment details
-                name: `${patient.name} ${patient.lastname}`,
-                age: age,
-                hour: `${medicalAppointment.startDate} `
+                ...appointment, // Include all medical appointment details
+                fullName: `${profile.fullName}`,
+                age: profile.age,
+                hour: `${appointment.startTime} `
               };
             })
           );
@@ -80,17 +83,5 @@ export class PatientsTableComponent implements OnInit {
     forkJoin(observables).subscribe((results: any[]) => {
       this.dataSource.data = results;
     });
-  }
-
-
-  private calculateAge(birthdate: string): number {
-    const today = new Date();
-    const birthDate = new Date(birthdate);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
   }
 }

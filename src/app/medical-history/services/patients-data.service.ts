@@ -14,11 +14,17 @@ export class PatientsDataService extends BaseService<PatientEntity> {
 
   constructor(http: HttpClient) {
     super(http);
-    this.basePath = 'https://json-server-vercel-open.vercel.app';
-    this.resourceEndpoint = '/patients';
+    this.basePath = 'https://hormonal-care-backend.up.railway.app/api/v1';
+   // this.basePath = 'http://localhost:8080/api/v1';
+    this.resourceEndpoint = '/medical-record/patient';
   }
 
   getPatientDetails(id: string): Observable<PatientEntity> {
     return this.http.get<PatientEntity>(`${this.basePath}${this.resourceEndpoint}/${id}`);
   }
+  getProfileIdByPatientId(id: number): Observable<number> {
+    return this.http.get<number>(`${this.basePath}${this.resourceEndpoint}/${id}/profile-id`);
+  }
+
 }
+

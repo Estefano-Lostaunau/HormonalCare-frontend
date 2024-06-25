@@ -3,36 +3,24 @@
   <table class="mat-elevation-z8">
     <tbody>
     <tr *ngFor="let element of dataSource">
-      <td class="left">Name</td>
-      <td class="right">{{element.name}}</td>
-    </tr>
-    <tr *ngFor="let element of dataSource">
-      <td class="left">Lastname</td>
-      <td class="right">{{element.lastname}}</td>
+      <td class="left">Full Name</td>
+      <td class="right">{{element.fullName}}</td>
     </tr>
     <tr *ngFor="let element of dataSource">
       <td class="left">Email</td>
       <td class="right">{{element.email}}</td>
     </tr>
     <tr *ngFor="let element of dataSource">
-      <td class="left">Qualification</td>
-      <td class="right">{{element.sub_speciality}}</td>
+      <td class="left">Sub Specialty</td>
+      <td class="right">{{element.subSpecialty}}</td>
     </tr>
     <tr *ngFor="let element of dataSource">
-      <td class="left">School N</td>
-      <td class="right">{{element.college_number}}</td>
+      <td class="left">Professional Identification Number</td>
+      <td class="right">{{element.professionalIdentificationNumber}}</td>
     </tr>
     <tr *ngFor="let element of dataSource">
-      <td class="left">Fee</td>
-      <td class="right">{{element.fee}}</td>
-    </tr>
-    <tr *ngFor="let element of dataSource">
-      <td class="left">Code of Doctor</td>
-      <td class="right">{{element.code_of_doctor}}</td>
-    </tr>
-    <tr *ngFor="let element of dataSource">
-      <td class="left">Password</td>
-      <td class="right">{{element.password}}</td>
+      <td class="left">Appointment Fee</td>
+      <td class="right">{{element.appointmentFee}}</td>
     </tr>
     </tbody>
   </table>

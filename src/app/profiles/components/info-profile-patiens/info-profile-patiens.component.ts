@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientEntity } from "../../model/patient.entity";
 import { PatientsProfileService } from "../../services/patients-profile.service";
+import { ProfilesService } from "../../services/profiles.service";
+import {ProfilesEntity} from "../../model/profiles.entity";
+import {PatientsDataService} from "../../../medical-history/services/patients-data.service";
 
 @Component({
   selector: 'app-info-profile-patiens',
@@ -8,41 +11,36 @@ import { PatientsProfileService } from "../../services/patients-profile.service"
   styleUrls: ['./info-profile-patiens.component.css']
 })
 export class InfoProfilePatiensComponent implements OnInit {
-  patientData!: PatientEntity;
-  dataSource: PatientEntity[] = [];
-  displayed: string[] = ['name', 'lastname', 'email', 'password'];
+  patient: PatientEntity = new PatientEntity();
+  profile: ProfilesEntity = new ProfilesEntity();
 
-  constructor(private patientService: PatientsProfileService) {}
-
+  constructor(private patientsDataService: PatientsDataService, private profileDataService: ProfilesService) {}
   ngOnInit() {
-    this.getPatientDetails('1'); // replace '1' with the actual patient ID
+    this.getPatientAndProfileDetails('1'); // replace '1' with the actual patient ID
   }
 
-  private getPatientDetails(id: string) {
-    this.patientService.getPatientDetails(id).subscribe((response: PatientEntity) => {
-      this.patientData = response;
-      this.dataSource = [this.patientData];
-    });
+  getPatientAndProfileDetails(patientId: string) {
+    this.patientsDataService.getProfileIdByPatientId(Number(patientId))
+      .subscribe((profileId: number) => {
+        // Obtén los detalles del perfil
+        this.profileDataService.getProfileDetails(profileId.toString())
+          .subscribe((data: ProfilesEntity) => {
+            console.log('Profile details:', data); // Log the profile details
+            this.profile = data;
+          }, error => {
+            console.error('Error fetching profile details:', error);
+          });
+
+        // Obtén los detalles del paciente
+        this.patientsDataService.getPatientDetails(patientId)
+          .subscribe((data: PatientEntity) => {
+            console.log('Patient details:', data); // Log the patient details
+            this.patient.typeofblood = data.typeofblood; // Solo guarda el tipo de sangre
+          }, error => {
+            console.error('Error fetching patient details:', error);
+          });
+      }, error => {
+        console.error('Error fetching profile ID:', error);
+      });
   }
-
-  sortData(sort: {active: string, direction: string}): void {
-    if (!sort.active || sort.direction === '') {
-      return;
-    }
-
-    this.dataSource = this.dataSource.sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
-      switch (sort.active) {
-        case 'name': return compare(a.name, b.name, isAsc);
-        case 'lastname': return compare(a.lastname, b.lastname, isAsc);
-        case 'email': return compare(a.email, b.email, isAsc);
-        case 'password': return compare(a.password, b.password, isAsc);
-        default: return 0;
-      }
-    });
-  }
-}
-
-function compare(a: string | number, b: string | number, isAsc: boolean) {
-  return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 }
